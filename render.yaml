@@ -1,0 +1,23 @@
+# Render Blueprint for the Oware multiplayer backend.
+# Deploy: push this repo to GitHub, then in Render → "New +" → "Blueprint"
+# and point it at the repo. Render reads this file automatically.
+#
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: oware-server
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Restrict CORS to your Hostinger site once it's live, e.g.
+      # https://yourdomain.com  (comma-separate multiple origins).
+      # Leave unset to allow all origins (fine for testing).
+      - key: FRONTEND_URL
+        sync: false
+      # Render injects PORT automatically; the server reads process.env.PORT.
