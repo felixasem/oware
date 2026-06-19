@@ -35,7 +35,10 @@ export function useSocket({ enabled, playerName }: UseSocketOptions) {
   useEffect(() => {
     if (!enabled) return;
 
-    const socket = io(SERVER_URL, { transports: ["websocket"] });
+    // Allow long-polling fallback (not websocket-only): on free hosts the
+    // server may be cold-starting, where a direct WebSocket upgrade can fail.
+    // Polling connects reliably during wake-up, then upgrades to WebSocket.
+    const socket = io(SERVER_URL, { transports: ["polling", "websocket"] });
     socketRef.current = socket;
 
     socket.on("connect", () => setConnected(true));

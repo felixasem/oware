@@ -86,8 +86,15 @@ io.on("connection", (socket) => {
   // ── Make Move ───────────────────────────────────────────────────────────────
   socket.on("game:move", ({ roomId, pit }: { roomId: string; pit: number }) => {
     const room = applyMoveToRoom(roomId, socket.id, pit);
-    if (!room) return;
+    if (!room) {
+      // Surface the rejection instead of failing silently, so the player
+      // isn't left wondering why nothing happened.
+      console.log(`[move] rejected: socket=${socket.id} room=${roomId} pit=${pit}`);
+      socket.emit("room:error", "That move isn't allowed right now.");
+      return;
+    }
 
+    console.log(`[move] socket=${socket.id} room=${roomId} pit=${pit} -> next player ${room.gameState.currentPlayer}`);
     io.to(roomId).emit("game:update", room.gameState);
   });
 
