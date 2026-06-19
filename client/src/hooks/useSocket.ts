@@ -35,10 +35,18 @@ export function useSocket({ enabled, playerName }: UseSocketOptions) {
   useEffect(() => {
     if (!enabled) return;
 
-    // Allow long-polling fallback (not websocket-only): on free hosts the
-    // server may be cold-starting, where a direct WebSocket upgrade can fail.
-    // Polling connects reliably during wake-up, then upgrades to WebSocket.
-    const socket = io(SERVER_URL, { transports: ["polling", "websocket"] });
+    // Connection tuned for free hosts that sleep (e.g. Render free tier):
+    // - polling fallback (not websocket-only) connects during cold start, then
+    //   upgrades to WebSocket.
+    // - 60s timeout so a single attempt can ride out the ~50s cold start
+    //   instead of aborting at the 20s default and never catching the wake-up.
+    // - keep retrying indefinitely.
+    const socket = io(SERVER_URL, {
+      transports: ["polling", "websocket"],
+      timeout: 60000,
+      reconnectionAttempts: Infinity,
+      reconnectionDelayMax: 5000,
+    });
     socketRef.current = socket;
 
     socket.on("connect", () => setConnected(true));
