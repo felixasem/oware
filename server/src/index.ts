@@ -11,12 +11,17 @@ import {
   removePlayerFromRoom,
 } from "./roomManager";
 
-// Allowed origins for CORS. In production, set FRONTEND_URL to your Hostinger
-// domain (comma-separated for multiple, e.g. "https://oware.com,https://www.oware.com").
+// Allowed origins for CORS. Set FRONTEND_URL to the frontend's URL
+// (comma-separated for multiple). Render's blueprint injects a bare hostname,
+// so we prepend https:// when no protocol is present — the browser's Origin
+// header always includes the protocol, and CORS matching is exact.
 // Falls back to "*" for local development.
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const corsOrigin: string | string[] = FRONTEND_URL
-  ? FRONTEND_URL.split(",").map((s) => s.trim())
+  ? FRONTEND_URL.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((o) => (/^https?:\/\//.test(o) ? o : `https://${o}`))
   : "*";
 
 const app = express();

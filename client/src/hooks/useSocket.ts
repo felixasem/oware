@@ -4,7 +4,13 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import type { GameState, ChatMessage } from "@/types/game";
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3001";
+// Normalize the backend URL. Render's blueprint auto-wiring provides a bare
+// hostname (e.g. "oware-server.onrender.com") with no protocol — add https://
+// in that case. Falls back to the local dev server.
+const RAW_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3001";
+const SERVER_URL = /^https?:\/\//.test(RAW_SERVER_URL)
+  ? RAW_SERVER_URL
+  : `https://${RAW_SERVER_URL}`;
 
 interface UseSocketOptions {
   enabled: boolean;

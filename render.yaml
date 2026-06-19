@@ -1,10 +1,14 @@
-# Render Blueprint for the Oware multiplayer backend.
-# Deploy: push this repo to GitHub, then in Render → "New +" → "Blueprint"
-# and point it at the repo. Render reads this file automatically.
+# Render Blueprint — hosts the WHOLE Oware game on Render.
 #
+#   oware-server : Node Web Service (Express + Socket.io)  → multiplayer backend
+#   oware-web    : Static Site (Next.js export)            → the game frontend
+#
+# Deploy: Render dashboard → New → Blueprint → pick the "oware" GitHub repo →
+# Apply. Render reads this file and creates BOTH services, wired together.
 # Docs: https://render.com/docs/blueprint-spec
 
 services:
+  # ── Multiplayer backend ────────────────────────────────────────────────────
   - type: web
     name: oware-server
     runtime: node
@@ -15,9 +19,33 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
-      # Restrict CORS to your Hostinger site once it's live, e.g.
-      # https://yourdomain.com  (comma-separate multiple origins).
-      # Leave unset to allow all origins (fine for testing).
+      # CORS is locked to the frontend's URL automatically.
       - key: FRONTEND_URL
-        sync: false
-      # Render injects PORT automatically; the server reads process.env.PORT.
+        fromService:
+          type: web
+          name: oware-web
+          property: host
+
+  # ── Frontend (static Next.js export) ───────────────────────────────────────
+  - type: web
+    name: oware-web
+    runtime: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: out
+    autoDeploy: true
+    # SPA fallback so client routes resolve to index.html.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # The backend hostname is injected automatically; the client prepends
+      # https:// (see client/src/hooks/useSocket.ts).
+      - key: NEXT_PUBLIC_SERVER_URL
+        fromService:
+          type: web
+          name: oware-server
+          property: host
+      - key: NEXT_PUBLIC_ENABLE_MULTIPLAYER
+        value: "true"
