@@ -19,12 +19,10 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
-      # CORS is locked to the frontend's URL automatically.
+      # CORS locked to the frontend's URL. Hardcoded (not fromService) to avoid
+      # a circular dependency that left the value unresolved on first sync.
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: oware-web
-          property: host
+        value: https://oware-web.onrender.com
 
   # ── Frontend (static Next.js export) ───────────────────────────────────────
   - type: web
@@ -40,12 +38,9 @@ services:
         source: /*
         destination: /index.html
     envVars:
-      # The backend hostname is injected automatically; the client prepends
-      # https:// (see client/src/hooks/useSocket.ts).
+      # Backend URL baked into the static build. Hardcoded (not fromService) so
+      # it resolves at build time without a circular dependency.
       - key: NEXT_PUBLIC_SERVER_URL
-        fromService:
-          type: web
-          name: oware-server
-          property: host
+        value: https://oware-server.onrender.com
       - key: NEXT_PUBLIC_ENABLE_MULTIPLAYER
         value: "true"
