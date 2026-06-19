@@ -22,7 +22,7 @@ export default function Home() {
   const [config, setConfig] = useState<SessionConfig>({ playerName: "Player 1", aiDifficulty: "medium" });
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-start py-6 px-2">
+    <main className="min-h-screen flex flex-col items-center justify-start py-6 px-1 sm:px-2">
       {screen === "menu" && (
         <Menu
           onStartSingle={(name, diff) => {

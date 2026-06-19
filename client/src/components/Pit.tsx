@@ -38,7 +38,9 @@ export default function Pit({
       whileTap={canClick ? { scale: 0.95 } : {}}
       className={clsx(
         "relative flex flex-col items-center justify-center rounded-full transition-all duration-200 select-none",
-        "w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24",
+        // Fluid: each pit shares the row width equally and stays circular,
+        // so the board fits any screen width (small phones → desktop).
+        "flex-1 min-w-0 aspect-square",
         // Base pit colors
         player === 0
           ? "bg-wood-700"
@@ -61,7 +63,7 @@ export default function Pit({
       {/* Seed count label */}
       <span
         className={clsx(
-          "text-lg sm:text-xl font-bold font-display z-10",
+          "text-sm sm:text-xl font-bold font-display z-10",
           seeds === 0 ? "text-wood-600" : "text-yellow-200",
         )}
       >
@@ -100,7 +102,11 @@ function SeedDots({ seeds, isLastSown }: { seeds: number; isLastSown: boolean })
             className={clsx(
               "rounded-full shadow-seed",
               DOT_COLORS[i % DOT_COLORS.length],
-              seeds <= 4 ? "w-3 h-3" : seeds <= 8 ? "w-2 h-2" : "w-1.5 h-1.5"
+              seeds <= 4
+                ? "w-2 h-2 sm:w-3 sm:h-3"
+                : seeds <= 8
+                ? "w-1.5 h-1.5 sm:w-2 sm:h-2"
+                : "w-1 h-1 sm:w-1.5 sm:h-1.5"
             )}
             initial={isLastSown ? { scale: 0, opacity: 0 } : false}
             animate={{ scale: 1, opacity: 1 }}

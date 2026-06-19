@@ -69,7 +69,7 @@ export default function Board({ state, localPlayer, onMove, disabled, playerName
 
       {/* The wooden board */}
       <motion.div
-        className="relative flex items-center gap-2 sm:gap-3 bg-wood-600 rounded-2xl p-3 sm:p-4 shadow-2xl border-4 border-wood-400"
+        className="relative flex items-center gap-1 sm:gap-3 bg-wood-600 rounded-2xl p-1.5 sm:p-4 shadow-2xl border-2 sm:border-4 border-wood-400 w-full max-w-2xl"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4 }}
@@ -78,15 +78,15 @@ export default function Board({ state, localPlayer, onMove, disabled, playerName
         <Store seeds={captured[displayTopPlayer]} label="Captured" side="left" />
 
         {/* Pits grid */}
-        <div className="flex flex-col gap-2 sm:gap-3">
+        <div className="flex-1 min-w-0 flex flex-col gap-1 sm:gap-3">
           {/* Top row – opponent */}
-          <div className="flex gap-2 sm:gap-3">
+          <div className="flex gap-1 sm:gap-3">
             {displayTopPits.map((pit) => renderPit(pit, displayTopPlayer))}
           </div>
           {/* Divider */}
           <div className="h-px bg-wood-400 opacity-40 mx-2" />
           {/* Bottom row – local player */}
-          <div className="flex gap-2 sm:gap-3">
+          <div className="flex gap-1 sm:gap-3">
             {displayBottomPits.map((pit) => renderPit(pit, displayBottomPlayer))}
           </div>
         </div>
@@ -131,12 +131,12 @@ export default function Board({ state, localPlayer, onMove, disabled, playerName
 function Store({ seeds, label, side }: { seeds: number; label: string; side: "left" | "right" }) {
   return (
     <div
-      className={`flex flex-col items-center justify-center bg-wood-900 rounded-xl px-2 py-4 min-w-[44px] shadow-pit border border-wood-400 border-opacity-30 ${
-        side === "left" ? "mr-1" : "ml-1"
+      className={`shrink-0 flex flex-col items-center justify-center bg-wood-900 rounded-xl px-1 py-3 sm:px-2 sm:py-4 min-w-[26px] sm:min-w-[44px] shadow-pit border border-wood-400 border-opacity-30 ${
+        side === "left" ? "mr-0.5 sm:mr-1" : "ml-0.5 sm:ml-1"
       }`}
     >
-      <span className="text-2xl font-bold text-yellow-200 font-display">{seeds}</span>
-      <span className="text-[10px] text-wood-300 mt-1 rotate-90 whitespace-nowrap origin-center">{label}</span>
+      <span className="text-base sm:text-2xl font-bold text-yellow-200 font-display">{seeds}</span>
+      <span className="hidden sm:block text-[10px] text-wood-300 mt-1 rotate-90 whitespace-nowrap origin-center">{label}</span>
     </div>
   );
 }
